@@ -3,6 +3,50 @@ set -e
 useragent="https://github.com/satanicantichrist/Server-Updater (contact@satanicantichrist.cz)"
 basecommand="server.update"
 
+updateExisting(){
+	if ! [ -e version.json ]
+	then
+		echo "No server installation found, run \"$basecommand <game-version>\" to install it."
+		exit 1
+	fi
+	mcversion=$(jq ".minecraft" ./version.json | cut -d "\"" -f 2)
+	prversion=$(jq ".paper" ./version.json)
+	echo "Current minecrat version $mcversion"
+	echo "Current Paper version $prversion"
+
+	echo "Fetching newest Paper version..."
+	paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
+	nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
+	if [[ $prversion -ge $nprversion ]]
+	then
+		echo "You already have the newest version of Paper."
+		exit 0
+	fi
+
+	echo "New version of Paper found ($nprversion), downloading..."
+	curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
+	echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" > version.json
+
+}
+
+downloadNew(){
+	mcversion=$1
+	paperversion=$2
+	echo "Fetching newest Paper version for Minecraft $mcversion..."
+	paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
+	if [[ $paperversion == "" ]]
+		then
+			nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
+    else
+		nprversion=$paperversion
+    fi
+
+	echo "Downloading Paper ($nprversion)..."
+	curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
+	echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" > version.json
+
+}
+
 listHelp(){
 	echo "To list available Minecraft version use \"$basecommand ls mc\""
 	echo "To list available Paper versions use ls \"$basecommand paper <game-version>\""
@@ -46,45 +90,15 @@ if [[ $1 == "ls" ]]
 		exit 0
 	fi
 
-if [[ $1 == "" ]]
-then
-	if ! [ -e version.json ]
-	then
-		echo "No server installation found, run \"server.update <game-version>\" to install it."
-		exit 1
-	fi
-	mcversion=$(jq ".minecraft" ./version.json | cut -d "\"" -f 2)
-	prversion=$(jq ".paper" ./version.json)
-	echo "Current minecrat version $mcversion"
-	echo "Current Paper version $prversion"
 
-	echo "Fetching newest Paper version..."
-	paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
-	nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
-	if [[ $prversion -ge $nprversion ]]
-	then
-		echo "You already have the newest version of Paper."
-		exit 0
-	fi
-
-	echo "New version of Paper found ($nprversion), downloading..."
-	curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
-	echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" > version.json
+if [[ $1 == "update" ]]
+    then
+        updateExisting
 	exit 0
-else
-	mcversion=$1
-	paperversion=$2
-	echo "Fetching newest Paper version for Minecraft $mcversion..."
-	paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
-	if [[ $paperversion == "" ]]
-		then
-			nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
-    else
-		nprversion=$paperversion
-    fi
+fi
 
-	echo "Downloading Paper ($nprversion)..."
-	curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
-	echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" > version.json
+if [[ $1 == "install" ]]
+    then
+        downloadNew $2 $3
 	exit 0
 fi
