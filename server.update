@@ -1,22 +1,24 @@
 #!/bin/bash
 set -e
-useragent="https://github.com/satanicantichrist/Server-Updater (satanciantichrist1@protonmail.com)"
+useragent="https://github.com/satanicantichrist/Server-Updater (contact@satanicantichrist.cz)"
 
 if [[ $1 == "ls" ]]
 	then
 		if [[ $2 == "" ]]
 			then
-				echo "To list avaible Minecraft version use ls mc"
-				echo "To list avaible Paper versions use ls mc <Minecraft version>"
+				echo "To list available Minecraft version use ls mc"
+				echo "To list available Paper versions use ls mc <Minecraft version>"
 				exit 0
 			fi
 			if [[ $2 == "mc" ]] && [[ $3 == "" ]]
 			then
+				echo "Available Minecraft versions:"
 				curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc; do echo $mc; done
 				exit 0
 			fi
 		if [[ $3 != "" ]]
 			then
+				echo "Available Paper versions for Minecraft $3"
 				curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$3/builds | jq -r ".builds.[]" | jq -r ".build" |  while read -r build; do echo $build; done
 				exit 0
 			fi
@@ -27,7 +29,7 @@ if [[ $1 == "" ]]
 then
 	if ! [ -e version.json ]
 	then
-		echo "Server version missing, nothing to update. To download it, specify the game version."
+		echo "Server version missing, nothing to update. To download it, specify Minecraft version."
 		exit 1
 	fi
 	mcversion=$(jq ".minecraft" ./version.json | cut -d "\"" -f 2)
@@ -44,14 +46,14 @@ then
 		exit 0
 	fi
 
-	echo New version of Paper found, downloading $nprversion...
+	echo "New version of Paper found ($nprversion), downloading..."
 	curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
 	echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" > version.json
 	exit 0
 else
 	mcversion=$1
 	paperversion=$2
-	echo Fetching newest Paper version "for" Minecraft $mcversion...
+	echo "Fetching newest Paper version for Minecraft $mcversion..."
 	paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
 	if [[ $paperversion == "" ]]
 		then
@@ -60,7 +62,7 @@ else
 		nprversion=$paperversion
     fi
 
-	echo Downloading Paper $nprversion...
+	echo "Downloading Paper ($nprversion)..."
 	curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
 	echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" > version.json
 	exit 0
