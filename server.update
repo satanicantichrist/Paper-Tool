@@ -54,7 +54,7 @@ installHelp(){
 
 listHelp(){
 	echo "To list available Minecraft version run \"$basecommand ls mc\""
-	echo "To list available Paper versions run \"$basecommand paper <game-version>\""
+	echo "To list available Paper versions run \"$basecommand ls paper <game-version>\""
 }
 
 listMc(){
@@ -115,6 +115,12 @@ if [[ $1 == "install" ]]
 fi
 
 if [[ $1 == "help" ]]
+    then
+        listHelp
+        installHelp
+fi
+
+if [[ $1 == "" ]]
     then
         listHelp
         installHelp
