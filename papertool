@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-useragent="https://github.com/satanicantichrist/Server-Updater (contact@satanicantichrist.cz)"
+useragent="https://github.com/satanicantichrist/Paper-Tool (contact@satanicantichrist.cz)"
 basecommand="papertool"
 
 updateExisting(){
