@@ -29,20 +29,20 @@ if [[ $1 == "" ]]
 then
 	if ! [ -e version.json ]
 	then
-		echo "Server version missing, nothing to update. To download it, specify Minecraft version."
+		echo "No server installation found, run \"server.update <game-version>\" to install it."
 		exit 1
 	fi
 	mcversion=$(jq ".minecraft" ./version.json | cut -d "\"" -f 2)
 	prversion=$(jq ".paper" ./version.json)
-	echo Current minecrat version $mcversion
-	echo Current Paper version $prversion
+	echo "Current minecrat version $mcversion"
+	echo "Current Paper version $prversion"
 
-	echo Fetching newest Paper version...
+	echo "Fetching newest Paper version..."
 	paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
 	nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
 	if [[ $prversion -ge $nprversion ]]
 	then
-		echo You already have the newest version of Paper.
+		echo "You already have the newest version of Paper."
 		exit 0
 	fi
 
