@@ -113,3 +113,9 @@ if [[ $1 == "install" ]]
         fi
 	exit 0
 fi
+
+if [[ $1 == "help" ]]
+    then
+        listHelp
+        installHelp
+fi
