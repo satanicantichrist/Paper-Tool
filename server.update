@@ -6,7 +6,7 @@ basecommand="server.update"
 updateExisting(){
 	if ! [ -e version.json ]
 	then
-		echo "No server installation found, run \"$basecommand <game-version>\" to install it."
+		echo "No server installation found, run \"$basecommand install <game-version>\" to install it."
 		exit 1
 	fi
 	mcversion=$(jq ".minecraft" ./version.json | cut -d "\"" -f 2)
@@ -47,9 +47,14 @@ downloadNew(){
 
 }
 
+installHelp(){
+    echo "To install a new server run \"$basecommand install <game-version>\""
+    echo "Or with specific build of paper run \"$basecommand install <game-version> <paper-build-id>\""
+}
+
 listHelp(){
-	echo "To list available Minecraft version use \"$basecommand ls mc\""
-	echo "To list available Paper versions use ls \"$basecommand paper <game-version>\""
+	echo "To list available Minecraft version run \"$basecommand ls mc\""
+	echo "To list available Paper versions run \"$basecommand paper <game-version>\""
 }
 
 listMc(){
@@ -58,7 +63,7 @@ listMc(){
 }
 
 listPaper(){
-	echo "Available Paper versions for Minecraft $1"
+	echo "Available Paper builds for Minecraft $1"
 	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -r ".builds.[]" | jq -r ".build" |  while read -r build; do echo $build; done
 }
 
@@ -99,6 +104,12 @@ fi
 
 if [[ $1 == "install" ]]
     then
-        downloadNew $2 $3
+        if [[ $2 == "" ]]
+            then
+                installHelp
+                exit 1
+            else
+            downloadNew $2 $3
+        fi
 	exit 0
 fi
