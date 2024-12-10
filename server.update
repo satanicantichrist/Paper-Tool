@@ -1,28 +1,49 @@
 #!/bin/bash
 set -e
 useragent="https://github.com/satanicantichrist/Server-Updater (contact@satanicantichrist.cz)"
+basecommand="server.update"
+
+listHelp(){
+	echo "To list available Minecraft version use \"$basecommand ls mc\""
+	echo "To list available Paper versions use ls \"$basecommand paper <game-version>\""
+}
+
+listMc(){
+	echo "Available Minecraft versions:"
+	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc; do echo $mc; done
+}
+
+listPaper(){
+	echo "Available Paper versions for Minecraft $1"
+	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -r ".builds.[]" | jq -r ".build" |  while read -r build; do echo $build; done
+}
 
 if [[ $1 == "ls" ]]
 	then
 		if [[ $2 == "" ]]
 			then
-				echo "To list available Minecraft version use ls mc"
-				echo "To list available Paper versions use ls mc <Minecraft version>"
+			    listHelp
 				exit 0
 			fi
-			if [[ $2 == "mc" ]] && [[ $3 == "" ]]
+
+			if [[ $2 == "mc" ]]
+			 then
+		        listMc
+				exit 0
+			fi
+
+		if [[ $2 == paper ]] && [[ $3 == "" ]]
+		  then
+				listHelp
+				exit 1
+			fi
+
+		if [[ $2 == "paper" ]] && [[ $3 != "" ]]
 			then
-				echo "Available Minecraft versions:"
-				curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc; do echo $mc; done
+			    listPaper $3
 				exit 0
 			fi
-		if [[ $3 != "" ]]
-			then
-				echo "Available Paper versions for Minecraft $3"
-				curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$3/builds | jq -r ".builds.[]" | jq -r ".build" |  while read -r build; do echo $build; done
-				exit 0
-			fi
-			exit 0
+		exit 0
 	fi
 
 if [[ $1 == "" ]]
