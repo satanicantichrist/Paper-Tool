@@ -65,16 +65,16 @@
   Lists all available Minecraft versions. This command allows you to see all the versions of Minecraft that can be used for your PaperMC server.
 
 - **`papertool ls paper <minecraft_version>`**
-  Lists all available Paper builds for a specified Minecraft version. For example, `ls paper 1.16.5` will show all Paper builds for Minecraft 1.16.5.
+  Lists all available Paper builds for a specified Minecraft version.
 
 - **`papertool update`**
-  Automatically updates to the newest PaperMC build for the currently installed Minecraft version.
+  Updates to the newest PaperMC build for the currently installed Minecraft version.
 
 - **`papertool install <minecraft_version> <paper_build_id>`**
-  Installs a specified Minecraft version and optionally a specific Paper build. If the Paper build ID is provided, it will install that build.
+  Installs a specified Minecraft version and optionally a specifiied Paper build.
 
 - **`papertool info`**
-  Displays information about the currently installed Minecraft version and Paper build ID. This command is helpful to verify your setup.
+  Displays information about the currently installed Minecraft version and Paper build ID.
 
 ---
 
