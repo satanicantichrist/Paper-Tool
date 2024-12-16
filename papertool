@@ -3,6 +3,18 @@ set -e
 useragent="https://github.com/satanicantichrist/Paper-Tool (contact@satanicantichrist.cz)"
 basecommand="papertool"
 
+printVersion(){
+    if ! [ -e version.json ]
+        then
+            echo "No server installation found, run \"$basecommand install <game-version>\" to install it."
+            exit 1
+        fi
+
+    echo "Installed Minecraft version: $(jq -r ".minecraft" ./version.json)"
+    echo "Installed Paper build: $(jq -r ".paper" ./version.json)"
+    exit 0
+}
+
 updateExisting(){
 	if ! [ -e version.json ]
 	then
@@ -57,6 +69,20 @@ listHelp(){
 	echo "To list available Paper versions run \"$basecommand ls paper <game-version>\""
 }
 
+infoHelp(){
+    echo "To see currently installed version, run \"$basecommand info\""
+    exit 0
+}
+
+globalHelp(){
+    listHelp
+    echo ""
+    installHelp
+    echo ""
+    infoHelp
+    exit 0
+}
+
 listMc(){
 	echo "Available Minecraft versions:"
 	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc; do echo $mc; done
@@ -66,6 +92,12 @@ listPaper(){
 	echo "Available Paper builds for Minecraft $1"
 	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -r ".builds.[]" | jq -r ".build" |  while read -r build; do echo $build; done
 }
+
+if [[ $1 == "info" ]]
+    then
+        printVersion
+        exit 0
+    fi
 
 if [[ $1 == "ls" ]]
 	then
@@ -116,12 +148,10 @@ fi
 
 if [[ $1 == "help" ]]
     then
-        listHelp
-        installHelp
+        globalHelp
 fi
 
 if [[ $1 == "" ]]
     then
-        listHelp
-        installHelp
+        globalHelp
 fi
