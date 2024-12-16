@@ -21,7 +21,7 @@ updateExisting(){
 		echo "No server installation found, run \"$basecommand install <game-version>\" to install it."
 		exit 1
 	fi
-	mcversion=$(jq ".minecraft" ./version.json | cut -d "\"" -f 2)
+	mcversion=$(jq -r ".minecraft" ./version.json)
 	prversion=$(jq ".paper" ./version.json)
 	echo "Current minecrat version $mcversion"
 	echo "Current Paper version $prversion"
