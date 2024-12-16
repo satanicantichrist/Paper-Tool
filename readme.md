@@ -1,6 +1,6 @@
 # Paper-Tool
 
-**Paper-Tool** is a simple and efficient Bash script that helps you download, install, and update PaperMC Minecraft server software. With just a few commands, you can manage different Minecraft and Paper builds effortlessly. Whether you're setting up a new server or keeping your existing server updated, **Paper-Tool** makes it easy to handle the installation and update process.
+**Paper-Tool** is a simple and efficient Bash script that helps you download, install, and update [PaperMC](https://papermc.io/) Minecraft server software. With just a few commands, you can manage different Minecraft and Paper builds effortlessly. Whether you're setting up a new server or keeping your existing server updated, **Paper-Tool** makes it easy to handle the installation and update process.
 
 ---
 
@@ -24,7 +24,7 @@
 ---
 
 ## Installation
-### From HomeBrew
+### From [HomeBrew](https://brew.sh/)
 1. **Tap my formula**:
    ```bash
    $ brew tap satanicantichrist/satanicantichrist
