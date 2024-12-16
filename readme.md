@@ -71,7 +71,7 @@
   Updates to the newest PaperMC build for the currently installed Minecraft version.
 
 - **`papertool install <minecraft_version> <paper_build_id>`**
-  Installs a specified Minecraft version and optionally a specifiied Paper build.
+  Installs a specified Minecraft version and optionally a specified Paper build.
 
 - **`papertool info`**
   Displays information about the currently installed Minecraft version and Paper build ID.
