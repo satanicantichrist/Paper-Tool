@@ -20,6 +20,7 @@
 - **Install Minecraft and Paper**: Installs a specific Minecraft version and optionally a specific Paper build.
 - **Update Server**: Update to the latest Paper build for the installed Minecraft version with single command.
 - **Server Information**: Display the current installed Minecraft version and Paper build.
+- **Server Start**: Start easily your server with one command.
 
 ---
 
@@ -76,6 +77,9 @@
 - **`papertool info`**
   Displays information about the currently installed Minecraft version and Paper build ID. This command is helpful to verify your setup.
 
+- **`papertool run <"accept-eula">`**
+  Starts server without gui, if you use argument `accept-eula`, it will automatically accept eula and start the server.
+
 ---
 
 ### Examples
@@ -123,3 +127,9 @@ output:
 Installed Minecraft version: 1.21.3
 Installed Paper build: 81
 ```
+This starts your server.
+#### Example 6: Start server
+```bash
+$ papertool run accept-eula
+```
+This starts your server, and automatically accepts eula, so you don´t have to edit the file after the first start.

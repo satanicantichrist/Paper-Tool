@@ -12,7 +12,16 @@ printVersion(){
 
     echo "Installed Minecraft version: $(jq -r ".minecraft" ./version.json)"
     echo "Installed Paper build: $(jq -r ".paper" ./version.json)"
-    exit 0
+}
+
+acceptEula(){
+    echo "eula=true" > eula.txt
+    echo "Accepted Eula"
+}
+
+defaultRun(){
+    echo "Starting server..."
+    java -jar server.jar --nogui
 }
 
 updateExisting(){
@@ -71,7 +80,6 @@ listHelp(){
 
 infoHelp(){
     echo "To see currently installed version, run \"$basecommand info\""
-    exit 0
 }
 
 globalHelp(){
@@ -80,7 +88,6 @@ globalHelp(){
     installHelp
     echo ""
     infoHelp
-    exit 0
 }
 
 listMc(){
@@ -92,6 +99,22 @@ listPaper(){
 	echo "Available Paper builds for Minecraft $1"
 	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -r ".builds.[]" | jq -r ".build" |  while read -r build; do echo $build; done
 }
+
+if [[ $1 == "run" ]]
+    then
+        if [[ $2 == "accept-eula" ]]
+            then
+                acceptEula
+            fi
+        defaultRun
+        exit 0
+    fi
+
+if [[ $1 == "accept-eula" ]]
+    then
+        acceptEula
+        exit 0
+    fi
 
 if [[ $1 == "info" ]]
     then
@@ -142,6 +165,7 @@ if [[ $1 == "install" ]]
                 exit 1
             else
             downloadNew $2 $3
+            exit 0
         fi
 	exit 0
 fi
@@ -149,9 +173,11 @@ fi
 if [[ $1 == "help" ]]
     then
         globalHelp
+        exit 0
 fi
 
 if [[ $1 == "" ]]
     then
         globalHelp
+        exit 0
 fi
