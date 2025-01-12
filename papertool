@@ -97,7 +97,12 @@ listMc(){
 
 listPaper(){
 	echo "Available Paper builds for Minecraft $1"
-	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -r ".builds.[]" | jq -r ".build" |  while read -r build; do echo $build; done
+	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -c ".builds.[]" | while read -r builds
+	   do
+			build=$(jq -r ".build" <<< "$builds")
+			summary=$(jq -r ".changes.[0].summary" <<< "$builds")
+			echo "$build - $summary."
+	   done
 }
 
 if [[ $1 == "run" ]]
