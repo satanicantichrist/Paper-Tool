@@ -82,12 +82,25 @@ infoHelp(){
     echo "To see currently installed version, run \"$basecommand info\""
 }
 
+acceptEulaHelp(){
+    echo "To accept Eula without starting server, run \"$basecommand accept-eula\""
+}
+
+runHelp(){
+    echo "To run server, run \"$basecommand run\""
+    echo "To run server and accept Eula, run \"$basecommand run accept-eula\""
+}
+
 globalHelp(){
     listHelp
     echo ""
     installHelp
     echo ""
     infoHelp
+    echo ""
+    acceptEulaHelp
+    echo ""
+    runHelp
 }
 
 listMc(){
