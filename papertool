@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 useragent="https://github.com/satanicantichrist/Paper-Tool (contact@satanicantichrist.cz)"
+toolApiUrl="https://cdn.satanicantichrist.cz/paper-tool/versions.json"
 basecommand="papertool"
 
 printVersion(){
@@ -82,22 +83,58 @@ infoHelp(){
     echo "To see currently installed version, run \"$basecommand info\""
 }
 
+acceptEulaHelp(){
+    echo "To accept Eula without starting server, run \"$basecommand accept-eula\""
+}
+
+runHelp(){
+    echo "To run server, run \"$basecommand run\""
+    echo "To run server and accept Eula, run \"$basecommand run accept-eula\""
+}
+
 globalHelp(){
     listHelp
     echo ""
     installHelp
     echo ""
     infoHelp
+    echo ""
+    acceptEulaHelp
+    echo ""
+    runHelp
 }
 
 listMc(){
 	echo "Available Minecraft versions:"
-	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc; do echo $mc; done
+	mcVersionsData=$(curl -s -A "$useragent" $toolApiUrl)
+	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc
+	   do
+			versionDescription=$(jq -r ".[] | select(.id == \"$mc\") | .title" <<< "$mcVersionsData")
+			echo "$mc - $versionDescription"
+	   done
+}
+
+listPaperDetail(){
+    data=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds/$2/)
+    echo "Paper build $2"
+    echo "File: $(jq -r ".downloads.application.name" <<< "$data")"
+    echo "File sha256: $(jq -r ".downloads.application.sha256" <<< "$data")"
+    echo "Changes: "
+
+    echo "$data" | jq -c ".changes.[]" | jq -r ".message" | while read -r message
+    	   do
+    			echo "$message"
+    	   done
 }
 
 listPaper(){
 	echo "Available Paper builds for Minecraft $1"
-	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -r ".builds.[]" | jq -r ".build" |  while read -r build; do echo $build; done
+	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -c ".builds.[]" | while read -r builds
+	   do
+			build=$(jq -r ".build" <<< "$builds")
+			summary=$(jq -r ".changes.[0].summary" <<< "$builds")
+			echo "$build - $summary."
+	   done
 }
 
 if [[ $1 == "run" ]]
@@ -120,6 +157,14 @@ if [[ $1 == "info" ]]
     then
         printVersion
         exit 0
+    fi
+
+if [[ $1 == "detail" ]]
+    then
+        if [[ $2 == "paper" ]]
+            then
+                listPaperDetail $3 $4
+            fi
     fi
 
 if [[ $1 == "ls" ]]
