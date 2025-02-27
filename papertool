@@ -4,225 +4,201 @@ useragent="https://github.com/satanicantichrist/Paper-Tool (contact@satanicantic
 toolApiUrl="https://cdn.satanicantichrist.cz/paper-tool/versions.json"
 basecommand="papertool"
 
-printVersion(){
-    if ! [ -e version.json ]
-        then
-            echo "No server installation found, run \"$basecommand install <game-version>\" to install it."
-            exit 1
-        fi
+printVersion() {
+  if ! [ -e version.json ]; then
+    echo "No server installation found, run \"$basecommand install <game-version>\" to install it."
+    exit 1
+  fi
 
-    echo "Installed Minecraft version: $(jq -r ".minecraft" ./version.json)"
-    echo "Installed Paper build: $(jq -r ".paper" ./version.json)"
+  echo "Installed Minecraft version: $(jq -r ".minecraft" ./version.json)"
+  echo "Installed Paper build: $(jq -r ".paper" ./version.json)"
 }
 
-acceptEula(){
-    echo "eula=true" > eula.txt
-    echo "Accepted Eula"
+acceptEula() {
+  echo "eula=true" >eula.txt
+  echo "Accepted Eula"
 }
 
-defaultRun(){
-    echo "Starting server..."
-    java -jar server.jar --nogui
+defaultRun() {
+  echo "Starting server..."
+  java -jar server.jar --nogui
 }
 
-updateExisting(){
-	if ! [ -e version.json ]
-	then
-		echo "No server installation found, run \"$basecommand install <game-version>\" to install it."
-		exit 1
-	fi
-	mcversion=$(jq -r ".minecraft" ./version.json)
-	prversion=$(jq ".paper" ./version.json)
-	echo "Current minecrat version $mcversion"
-	echo "Current Paper version $prversion"
+updateExisting() {
+  if ! [ -e version.json ]; then
+    echo "No server installation found, run \"$basecommand install <game-version>\" to install it."
+    exit 1
+  fi
+  mcversion=$(jq -r ".minecraft" ./version.json)
+  prversion=$(jq ".paper" ./version.json)
+  echo "Current minecrat version $mcversion"
+  echo "Current Paper version $prversion"
 
-	echo "Fetching newest Paper version..."
-	paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
-	nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
-	if [[ $prversion -ge $nprversion ]]
-	then
-		echo "You already have the newest version of Paper."
-		exit 0
-	fi
+  echo "Fetching newest Paper version..."
+  paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
+  nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
+  if [[ $prversion -ge $nprversion ]]; then
+    echo "You already have the newest version of Paper."
+    exit 0
+  fi
 
-	echo "New version of Paper found ($nprversion), downloading..."
-	curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
-	echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" > version.json
+  echo "New version of Paper found ($nprversion), downloading..."
+  curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
+  echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" >version.json
 
 }
 
-downloadNew(){
-	mcversion=$1
-	paperversion=$2
-	echo "Fetching newest Paper version for Minecraft $mcversion..."
-	paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
-	if [[ $paperversion == "" ]]
-		then
-			nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
-    else
-		nprversion=$paperversion
-    fi
+downloadNew() {
+  mcversion=$1
+  paperversion=$2
+  echo "Fetching newest Paper version for Minecraft $mcversion..."
+  paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
+  if [[ $paperversion == "" ]]; then
+    nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
+  else
+    nprversion=$paperversion
+  fi
 
-	echo "Downloading Paper ($nprversion)..."
-	curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
-	echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" > version.json
+  echo "Downloading Paper ($nprversion)..."
+  curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
+  echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" >version.json
 
 }
 
-installHelp(){
-    echo "To install a new server run \"$basecommand install <game-version>\""
-    echo "Or with specific build of paper run \"$basecommand install <game-version> <paper-build-id>\""
+installHelp() {
+  echo "To install a new server run \"$basecommand install <game-version>\""
+  echo "Or with specific build of paper run \"$basecommand install <game-version> <paper-build-id>\""
 }
 
-listHelp(){
-	echo "To list available Minecraft version run \"$basecommand ls mc\""
-	echo "To list available Paper versions run \"$basecommand ls paper <game-version>\""
+listHelp() {
+  echo "To list available Minecraft version run \"$basecommand ls mc\""
+  echo "To list available Paper versions run \"$basecommand ls paper <game-version>\""
 }
 
-infoHelp(){
-    echo "To see currently installed version, run \"$basecommand info\""
+infoHelp() {
+  echo "To see currently installed version, run \"$basecommand info\""
 }
 
-acceptEulaHelp(){
-    echo "To accept Eula without starting server, run \"$basecommand accept-eula\""
+acceptEulaHelp() {
+  echo "To accept Eula without starting server, run \"$basecommand accept-eula\""
 }
 
-runHelp(){
-    echo "To run server, run \"$basecommand run\""
-    echo "To run server and accept Eula, run \"$basecommand run accept-eula\""
+runHelp() {
+  echo "To run server, run \"$basecommand run\""
+  echo "To run server and accept Eula, run \"$basecommand run accept-eula\""
 }
 
-globalHelp(){
+globalHelp() {
+  listHelp
+  echo ""
+  installHelp
+  echo ""
+  infoHelp
+  echo ""
+  acceptEulaHelp
+  echo ""
+  runHelp
+}
+
+listMc() {
+  echo "Available Minecraft versions:"
+  mcVersionsData=$(curl -s -A "$useragent" $toolApiUrl)
+  curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc; do
+    versionDescription=$(jq -r ".[] | select(.id == \"$mc\") | .title" <<<"$mcVersionsData")
+    echo "$mc - $versionDescription"
+  done
+}
+
+listPaperDetail() {
+  data=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds/$2/)
+  echo "Paper build $2"
+  echo "File: $(jq -r ".downloads.application.name" <<<"$data")"
+  echo "File sha256: $(jq -r ".downloads.application.sha256" <<<"$data")"
+  echo "Changes: "
+
+  echo "$data" | jq -c ".changes.[]" | jq -r ".message" | while read -r message; do
+    echo "$message"
+  done
+}
+
+listPaper() {
+  echo "Available Paper builds for Minecraft $1"
+  curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -c ".builds.[]" | while read -r builds; do
+    build=$(jq -r ".build" <<<"$builds")
+    summary=$(jq -r ".changes.[0].summary" <<<"$builds")
+    echo "$build - $summary."
+  done
+}
+
+if [[ $1 == "run" ]]; then
+  if [[ $2 == "accept-eula" ]]; then
+    acceptEula
+  fi
+  defaultRun
+  exit 0
+fi
+
+if [[ $1 == "accept-eula" ]]; then
+  acceptEula
+  exit 0
+fi
+
+if [[ $1 == "info" ]]; then
+  printVersion
+  exit 0
+fi
+
+if [[ $1 == "detail" ]]; then
+  if [[ $2 == "paper" ]]; then
+    listPaperDetail $3 $4
+  fi
+fi
+
+if [[ $1 == "ls" ]]; then
+  if [[ $2 == "" ]]; then
     listHelp
-    echo ""
+    exit 0
+  fi
+
+  if [[ $2 == "mc" ]]; then
+    listMc
+    exit 0
+  fi
+
+  if [[ $2 == paper ]] && [[ $3 == "" ]]; then
+    listHelp
+    exit 1
+  fi
+
+  if [[ $2 == "paper" ]] && [[ $3 != "" ]]; then
+    listPaper $3
+    exit 0
+  fi
+  exit 0
+fi
+
+if [[ $1 == "update" ]]; then
+  updateExisting
+  exit 0
+fi
+
+if [[ $1 == "install" ]]; then
+  if [[ $2 == "" ]]; then
     installHelp
-    echo ""
-    infoHelp
-    echo ""
-    acceptEulaHelp
-    echo ""
-    runHelp
-}
-
-listMc(){
-	echo "Available Minecraft versions:"
-	mcVersionsData=$(curl -s -A "$useragent" $toolApiUrl)
-	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc
-	   do
-			versionDescription=$(jq -r ".[] | select(.id == \"$mc\") | .title" <<< "$mcVersionsData")
-			echo "$mc - $versionDescription"
-	   done
-}
-
-listPaperDetail(){
-    data=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds/$2/)
-    echo "Paper build $2"
-    echo "File: $(jq -r ".downloads.application.name" <<< "$data")"
-    echo "File sha256: $(jq -r ".downloads.application.sha256" <<< "$data")"
-    echo "Changes: "
-
-    echo "$data" | jq -c ".changes.[]" | jq -r ".message" | while read -r message
-    	   do
-    			echo "$message"
-    	   done
-}
-
-listPaper(){
-	echo "Available Paper builds for Minecraft $1"
-	curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -c ".builds.[]" | while read -r builds
-	   do
-			build=$(jq -r ".build" <<< "$builds")
-			summary=$(jq -r ".changes.[0].summary" <<< "$builds")
-			echo "$build - $summary."
-	   done
-}
-
-if [[ $1 == "run" ]]
-    then
-        if [[ $2 == "accept-eula" ]]
-            then
-                acceptEula
-            fi
-        defaultRun
-        exit 0
-    fi
-
-if [[ $1 == "accept-eula" ]]
-    then
-        acceptEula
-        exit 0
-    fi
-
-if [[ $1 == "info" ]]
-    then
-        printVersion
-        exit 0
-    fi
-
-if [[ $1 == "detail" ]]
-    then
-        if [[ $2 == "paper" ]]
-            then
-                listPaperDetail $3 $4
-            fi
-    fi
-
-if [[ $1 == "ls" ]]
-	then
-		if [[ $2 == "" ]]
-			then
-			    listHelp
-				exit 0
-			fi
-
-			if [[ $2 == "mc" ]]
-			 then
-		        listMc
-				exit 0
-			fi
-
-		if [[ $2 == paper ]] && [[ $3 == "" ]]
-		  then
-				listHelp
-				exit 1
-			fi
-
-		if [[ $2 == "paper" ]] && [[ $3 != "" ]]
-			then
-			    listPaper $3
-				exit 0
-			fi
-		exit 0
-	fi
-
-
-if [[ $1 == "update" ]]
-    then
-        updateExisting
-	exit 0
+    exit 1
+  else
+    downloadNew $2 $3
+    exit 0
+  fi
+  exit 0
 fi
 
-if [[ $1 == "install" ]]
-    then
-        if [[ $2 == "" ]]
-            then
-                installHelp
-                exit 1
-            else
-            downloadNew $2 $3
-            exit 0
-        fi
-	exit 0
+if [[ $1 == "help" ]]; then
+  globalHelp
+  exit 0
 fi
 
-if [[ $1 == "help" ]]
-    then
-        globalHelp
-        exit 0
-fi
-
-if [[ $1 == "" ]]
-    then
-        globalHelp
-        exit 0
+if [[ $1 == "" ]]; then
+  globalHelp
+  exit 0
 fi
