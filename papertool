@@ -35,16 +35,16 @@ updateExisting() {
   echo "Current Paper version $prversion"
 
   echo "Fetching newest Paper version..."
-  paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
-  nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
+  paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/"$mcversion"/builds)
+  nprversion=$(echo "$paperdata" | jq "[.builds.[].build] | max")
   if [[ $prversion -ge $nprversion ]]; then
     echo "You already have the newest version of Paper."
     exit 0
   fi
 
   echo "New version of Paper found ($nprversion), downloading..."
-  curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
-  echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" >version.json
+  curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/"$mcversion"/builds/"$nprversion"/downloads/paper-"$mcversion"-"$nprversion".jar -o ./server.jar
+  echo "{\"minecraft\": \"""$mcversion""\",\"paper\": ""$nprversion""}" >version.json
 
 }
 
@@ -52,15 +52,15 @@ downloadNew() {
   mcversion=$1
   paperversion=$2
   echo "Fetching newest Paper version for Minecraft $mcversion..."
-  paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds)
+  paperdata=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/"$mcversion"/builds)
   if [[ $paperversion == "" ]]; then
-    nprversion=$(echo $paperdata | jq "[.builds.[].build] | max")
+    nprversion=$(echo "$paperdata" | jq "[.builds.[].build] | max")
   else
     nprversion=$paperversion
   fi
 
   echo "Downloading Paper ($nprversion)..."
-  curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/$mcversion/builds/$nprversion/downloads/paper-$mcversion-$nprversion.jar -o ./server.jar
+  curl -A "$useragent" --progress-bar https://api.papermc.io/v2/projects/paper/versions/"$mcversion"/builds/"$nprversion"/downloads/paper-"$mcversion"-"$nprversion".jar -o ./server.jar
   echo "{\"minecraft\": \""$mcversion"\",\"paper\": "$nprversion"}" >version.json
 
 }
@@ -110,7 +110,7 @@ listMc() {
 }
 
 listPaperDetail() {
-  data=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds/$2/)
+  data=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/"$1"/builds/"$2"/)
   echo "Paper build $2"
   echo "File: $(jq -r ".downloads.application.name" <<<"$data")"
   echo "File sha256: $(jq -r ".downloads.application.sha256" <<<"$data")"
@@ -123,7 +123,7 @@ listPaperDetail() {
 
 listPaper() {
   echo "Available Paper builds for Minecraft $1"
-  curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/$1/builds | jq -c ".builds.[]" | while read -r builds; do
+  curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/"$1"/builds | jq -c ".builds.[]" | while read -r builds; do
     build=$(jq -r ".build" <<<"$builds")
     summary=$(jq -r ".changes.[0].summary" <<<"$builds")
     echo "$build - $summary."
@@ -150,7 +150,7 @@ fi
 
 if [[ $1 == "detail" ]]; then
   if [[ $2 == "paper" ]]; then
-    listPaperDetail $3 $4
+    listPaperDetail "$3" "$4"
   fi
 fi
 
@@ -171,7 +171,7 @@ if [[ $1 == "ls" ]]; then
   fi
 
   if [[ $2 == "paper" ]] && [[ $3 != "" ]]; then
-    listPaper $3
+    listPaper "$3"
     exit 0
   fi
   exit 0
@@ -187,7 +187,7 @@ if [[ $1 == "install" ]]; then
     installHelp
     exit 1
   else
-    downloadNew $2 $3
+    downloadNew "$2" "$3"
     exit 0
   fi
   exit 0
