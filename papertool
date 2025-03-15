@@ -138,14 +138,19 @@ if [[ $1 == "run" ]]; then
       exit 0
       ;;
     --accept-eula)
-      acceptEula
+      accept=true
+      shift
       ;;
     *)
       echo "Unknown argument $2"
       exit 1
       ;;
     esac
+    shift
   done
+  if [[ $accept == true ]]; then
+    acceptEula
+  fi
   defaultRun
   exit 0
 fi
