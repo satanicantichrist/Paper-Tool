@@ -25,111 +25,140 @@
 ---
 
 ## Installation
+
 ### From [HomeBrew](https://brew.sh/)
+
 1. **Tap my formula**:
+
    ```bash
-   $ brew tap satanicantichrist/satanicantichrist
-   ```
-2. **Install Paper-Tool**:
-   ```bash
-   $ brew install satanicantichrist/papertool
+   brew tap satanicantichrist/satanicantichrist
    ```
 
+2. **Install Paper-Tool**:
+
+   ```bash
+   brew install satanicantichrist/papertool
+   ```
 
 ### From source
+
 1. **Clone the repository**:
 
    ```bash
-   $ git clone https://github.com/satanicantichrist/Paper-Tool.git
+   git clone https://github.com/satanicantichrist/Paper-Tool.git
    ```
 
 2. **Navigate to the script directory**:
+
    ```bash
-   $ cd Paper-Tool
+   cd Paper-Tool
    ```
 
 3. **Make the script executable**:
+
    ```bash
-   $ chmod +x papertool
+   chmod +x papertool
    ```
 
 4. **Run the script**:
+
    ```bash
-   $ ./papertool
+   ./papertool
    ```
 
 ## Usage
 
 ### Commands
 
-- **`papertool ls mc`**
+- **`papertool list --minecraft`**
   Lists all available Minecraft versions. This command allows you to see all the versions of Minecraft that can be used for your PaperMC server.
 
-- **`papertool ls paper <minecraft_version>`**
-  Lists all available Paper builds for a specified Minecraft version. For example, `ls paper 1.16.5` will show all Paper builds for Minecraft 1.16.5.
+- **`papertool list --paper <minecraft_version>`**
+  Lists all available Paper builds for a specified Minecraft version. For example, `list --paper 1.16.5` will show all Paper builds for Minecraft 1.16.5.
 
 - **`papertool update`**
   Automatically updates to the newest PaperMC build for the currently installed Minecraft version.
 
-- **`papertool install <minecraft_version> <paper_build_id>`**
+- **`papertool install --minecraft-version <minecraft_version> --paper-version <paper_build_id>`**
   Installs a specified Minecraft version and optionally a specific Paper build. If the Paper build ID is provided, it will install that build.
 
 - **`papertool info`**
   Displays information about the currently installed Minecraft version and Paper build ID. This command is helpful to verify your setup.
 
-- **`papertool run <"accept-eula">`**
-  Starts server without gui, if you use argument `accept-eula`, it will automatically accept eula and start the server.
+- **`papertool run --accept-eula`**
+  Starts server without gui, if you use flag `--accept-eula`, it will automatically accept eula and start the server.
 
 ---
 
 ### Examples
 
 All examples are written with brew installation in mind, to use script downloaded from source use `./papertool` while being in scripts directory
+
 #### Example 1: List available Minecraft versions
 
 ```bash
-$ papertool ls mc
+papertool list --minecraft
 ```
+
 output:
+
 ```
 1.17.1
 1.18.2
 1.19.4
 1.20.1
 ```
+
 #### Example 2: List available Paper builds for Minecraft 1.18.2
+
 ```bash
-$ papertool ls paper 1.18.2
+papertool list --paper 1.18.2
 ```
+
 output:
+
 ```
 385
 386
 387
 388
 ```
+
 #### Example 3: Update to the latest Paper build
+
 ```bash
-$ papertool update
+papertool update
 ```
+
 This command will update your current PaperMC server to the latest stable build for the installed Minecraft version.
+
 #### Example 4: Install Minecraft 1.19.4 and a specific Paper build
+
 ```bash
-$ papertool install 1.19.4 540
+papertool install --minecraft-version 1.19.4 --paper-version 540
 ```
+
 This installs Minecraft 1.19.4 and Paper build 540.
+
 #### Example 5: Check the current installed version and build
+
 ```bash
-$ papertool info
+papertool info
 ```
+
 output:
+
 ```
 Installed Minecraft version: 1.21.3
 Installed Paper build: 81
 ```
+
 This starts your server.
+
 #### Example 6: Start server
+
 ```bash
-$ papertool run accept-eula
+papertool run --accept-eula
 ```
+
 This starts your server, and automatically accepts eula, so you don´t have to edit the file after the first start.
