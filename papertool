@@ -131,15 +131,22 @@ listPaper() {
 }
 
 if [[ $1 == "run" ]]; then
-  if [[ $2 == "accept-eula" ]]; then
-    acceptEula
-  fi
+  while [[ $# -gt 1 ]]; do
+    case "$2" in
+    -h | --help)
+      runHelp
+      exit 0
+      ;;
+    --accept-eula)
+      acceptEula
+      ;;
+    *)
+      echo "Unknown argument $2"
+      exit 1
+      ;;
+    esac
+  done
   defaultRun
-  exit 0
-fi
-
-if [[ $1 == "accept-eula" ]]; then
-  acceptEula
   exit 0
 fi
 
@@ -153,27 +160,44 @@ if [[ $1 == "detail" ]]; then
     listPaperDetail "$3" "$4"
   fi
 fi
-
-if [[ $1 == "ls" ]]; then
-  if [[ $2 == "" ]]; then
-    listHelp
-    exit 0
-  fi
-
-  if [[ $2 == "mc" ]]; then
+if [[ $1 == "list" ]]; then
+  minecraftVersion=""
+  while [[ $# -gt 1 ]]; do
+    case "$2" in
+    -h | --help)
+      listHelp
+      exit 0
+      ;;
+    --minecraft)
+      mode="mc"
+      break
+      ;;
+    --paper)
+      mode="paper"
+      if [[ -z "$3" ]]; then
+        echo "Missing Minecraft version!"
+        exit 1
+      fi
+      minecraftVersion="$3"
+      shift
+      ;;
+    *)
+      echo "Unknown argument $2"
+      exit 1
+      ;;
+    esac
+    shift
+  done
+  if [[ $mode == "mc" ]]; then
     listMc
     exit 0
   fi
 
-  if [[ $2 == paper ]] && [[ $3 == "" ]]; then
-    listHelp
-    exit 1
-  fi
-
-  if [[ $2 == "paper" ]] && [[ $3 != "" ]]; then
-    listPaper "$3"
+  if [[ $mode == "paper" ]]; then
+    listPaper "$minecraftVersion"
     exit 0
   fi
+
   exit 0
 fi
 
