@@ -88,6 +88,10 @@ runHelp() {
   echo "To run server and accept Eula, run \"$basecommand run accept-eula\""
 }
 
+detailHelp() {
+  echo "To see details of Paper build, run \"$basecommand detail --minecraft-version <version> --paper-build <build>\""
+}
+
 globalHelp() {
   listHelp
   echo ""
@@ -98,6 +102,8 @@ globalHelp() {
   acceptEulaHelp
   echo ""
   runHelp
+  echo ""
+  detailHelp
 }
 
 listMc() {
@@ -156,10 +162,31 @@ if [[ $1 == "info" ]]; then
 fi
 
 if [[ $1 == "detail" ]]; then
-  if [[ $2 == "paper" ]]; then
-    listPaperDetail "$3" "$4"
-  fi
+  while [[ $# -gt 1 ]]; do
+    case "$2" in
+    -h | --help)
+      detailHelp
+      exit 0
+      ;;
+    --minecraft-version)
+      minecraftVersion="$3"
+      shift
+      ;;
+    --paper-build)
+      paperBuild="$3"
+      shift
+      ;;
+    *)
+      echo "Unknown argument $2"
+      exit 1
+      ;;
+    esac
+    shift
+  done
+  listPaperDetail "$minecraftVersion" "$paperBuild"
+  exit 0
 fi
+
 if [[ $1 == "list" ]]; then
   minecraftVersion=""
   while [[ $# -gt 1 ]]; do
@@ -214,7 +241,6 @@ if [[ $1 == "install" ]]; then
     downloadNew "$2" "$3"
     exit 0
   fi
-  exit 0
 fi
 
 if [[ $1 == "help" ]]; then
