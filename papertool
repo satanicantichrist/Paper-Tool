@@ -66,30 +66,26 @@ downloadNew() {
 }
 
 installHelp() {
-  echo "To install a new server run \"$basecommand install <game-version>\""
-  echo "Or with specific build of paper run \"$basecommand install <game-version> <paper-build-id>\""
+  echo "To install a new server run \"$basecommand install --minecraft-version <minecraft-version>\""
+  echo "Or with specific build of paper run \"$basecommand install --minecraft-version <minecraft-version> --paper-build <paper-build>\""
 }
 
 listHelp() {
-  echo "To list available Minecraft version run \"$basecommand ls mc\""
-  echo "To list available Paper versions run \"$basecommand ls paper <game-version>\""
+  echo "To list available Minecraft version run \"$basecommand list --minecrat\""
+  echo "To list available Paper versions run \"$basecommand list --paper <minecraft-version>\""
 }
 
 infoHelp() {
   echo "To see currently installed version, run \"$basecommand info\""
 }
 
-acceptEulaHelp() {
-  echo "To accept Eula without starting server, run \"$basecommand accept-eula\""
-}
-
 runHelp() {
   echo "To run server, run \"$basecommand run\""
-  echo "To run server and accept Eula, run \"$basecommand run accept-eula\""
+  echo "To run server and accept Eula, run \"$basecommand run --accept-eula\""
 }
 
 detailHelp() {
-  echo "To see details of Paper build, run \"$basecommand detail --minecraft-version <version> --paper-build <build>\""
+  echo "To see details of Paper build, run \"$basecommand detail --minecraft-version <minecraft-version> --paper-build <paper-build>\""
 }
 
 globalHelp() {
@@ -98,8 +94,6 @@ globalHelp() {
   installHelp
   echo ""
   infoHelp
-  echo ""
-  acceptEulaHelp
   echo ""
   runHelp
   echo ""
@@ -188,7 +182,6 @@ if [[ $1 == "detail" ]]; then
 fi
 
 if [[ $1 == "list" ]]; then
-  minecraftVersion=""
   while [[ $# -gt 1 ]]; do
     case "$2" in
     -h | --help)
@@ -234,13 +227,39 @@ if [[ $1 == "update" ]]; then
 fi
 
 if [[ $1 == "install" ]]; then
-  if [[ $2 == "" ]]; then
-    installHelp
-    exit 1
-  else
-    downloadNew "$2" "$3"
-    exit 0
-  fi
+  minecraftVersion=""
+  while [[ $# -gt 1 ]]; do
+    case "$2" in
+    -h | --help)
+      installHelp
+      exit 0
+      ;;
+    --minecraft-version)
+      if [[ -z "$3" ]]; then
+        echo "Missing Minecraft version!"
+        exit 1
+      fi
+      minecraftVersion="$3"
+      shift
+      ;;
+    --paper-build)
+      if [[ -z "$3" ]]; then
+        paperBuild=""
+      else
+        paperBuild="$3"
+      fi
+      shift
+      ;;
+    *)
+      echo "Unknown argument $2"
+      exit 1
+      ;;
+    esac
+    shift
+  done
+  downloadNew "$minecraftVersion" "$paperBuild"
+
+  exit 0
 fi
 
 if [[ $1 == "help" ]]; then
