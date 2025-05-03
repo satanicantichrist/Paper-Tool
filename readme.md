@@ -70,6 +70,9 @@
 
 ### Commands
 
+- papertool-tui
+  Runs Paper-Tool in TUI mode.
+
 - **`papertool list --minecraft`**
   Lists all available Minecraft versions. This command allows you to see all the versions of Minecraft that can be used for your PaperMC server.
 
