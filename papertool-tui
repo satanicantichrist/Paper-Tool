@@ -23,11 +23,11 @@ mc-version() {
 }
 
 list-paper() {
-  echo $(./papertool list --clean --paper "$mcVersion" | tac | fzf | cut -d' ' -f1)
+  echo $(papertool list --clean --paper "$mcVersion" | tac | fzf | cut -d' ' -f1)
 }
 
 list-mc() {
-  echo $(./papertool list --clean --minecraft | tac | fzf | cut -d' ' -f1)
+  echo $(papertool list --clean --minecraft | tac | fzf | cut -d' ' -f1)
 }
 
 init-screen() {
