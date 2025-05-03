@@ -31,7 +31,7 @@ list-mc() {
 }
 
 init-screen() {
-  menu=("version installed" "list" "update")
+  menu=("version installed" "list" "update" "run" "accept eula and run")
   selection=$(printf "%s\n" "${menu[@]}" | fzf)
 
   case $selection in
@@ -44,6 +44,12 @@ init-screen() {
     ;;
   "update")
     papertool update
+    ;;
+  "run")
+    papertool run
+    ;;
+  "accept eula and run")
+    papertool run --accept-eula
     ;;
   *)
     echo "Invalid selection"
