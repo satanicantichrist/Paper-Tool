@@ -113,10 +113,10 @@ listMc() {
 
 listPaperDetail() {
   data=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/"$1"/builds/"$2"/)
-  echo "Paper build $2"
-  echo "File: $(jq -r ".downloads.application.name" <<<"$data")"
-  echo "File sha256: $(jq -r ".downloads.application.sha256" <<<"$data")"
-  echo "Changes: "
+  echo -e "Paper build $2\n"
+  echo -e "File: $(jq -r ".downloads.application.name" <<<"$data")\n"
+  echo -e "File sha256: $(jq -r ".downloads.application.sha256" <<<"$data")\n"
+  echo -e "Changes: \n "
 
   echo "$data" | jq -c ".changes.[]" | jq -r ".message" | while read -r message; do
     echo "$message"

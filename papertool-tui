@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+paper-preview() {
+  id=$(cut -d' ' -f1 <<<"$2")
+  fold -s -w $(tput cols) <<<$(papertool detail --minecraft-version $1 --paper-build $id)
+}
+
+export -f paper-preview
+
 mc-version() {
   mcVersion=$1
   menu=("install newest" "install specific version")
@@ -23,7 +30,7 @@ mc-version() {
 }
 
 list-paper() {
-  echo $(papertool list --clean --paper "$mcVersion" | tac | fzf | cut -d' ' -f1)
+  echo $(papertool list --clean --paper "$mcVersion" | tac | fzf --preview "paper-preview $mcVersion {}" | cut -d' ' -f1)
 }
 
 list-mc() {
