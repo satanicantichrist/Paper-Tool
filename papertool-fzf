@@ -1,0 +1,55 @@
+#!/bin/bash
+set -e
+
+mc-version() {
+  mcVersion=$1
+  menu=("install newest" "install specific version")
+  selection=$(printf "%s\n" "${menu[@]}" | fzf)
+
+  case $selection in
+  "install newest")
+    papertool install --minecraft-version $mcVersion
+    ;;
+  "install specific version")
+    paperBuild=$(list-paper)
+    papertool install --minecraft-version $mcVersion --paper-build $paperBuild
+    ;;
+  *)
+    echo "Invalid selection"
+    exit 1
+    ;;
+
+  esac
+}
+
+list-paper() {
+  echo $(./papertool list --clean --paper "$mcVersion" | tac | fzf | cut -d' ' -f1)
+}
+
+list-mc() {
+  echo $(./papertool list --clean --minecraft | tac | fzf | cut -d' ' -f1)
+}
+
+init-screen() {
+  menu=("version installed" "list" "update")
+  selection=$(printf "%s\n" "${menu[@]}" | fzf)
+
+  case $selection in
+  "version installed")
+    papertool info
+    ;;
+  "list")
+    version=$(list-mc)
+    mc-version "$version"
+    ;;
+  "update")
+    papertool update
+    ;;
+  *)
+    echo "Invalid selection"
+    exit 1
+    ;;
+  esac
+}
+
+init-screen
