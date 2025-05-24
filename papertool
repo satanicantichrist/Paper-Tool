@@ -101,7 +101,9 @@ globalHelp() {
 }
 
 listMc() {
-  echo "Available Minecraft versions:"
+  if [[ $1 != "true" ]]; then
+    echo "Available Minecraft versions:"
+  fi
   mcVersionsData=$(curl -s -A "$useragent" $toolApiUrl)
   curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/ | jq -r ".versions.[]" | while read -r mc; do
     versionDescription=$(jq -r ".[] | select(.id == \"$mc\") | .title" <<<"$mcVersionsData")
@@ -111,10 +113,10 @@ listMc() {
 
 listPaperDetail() {
   data=$(curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/"$1"/builds/"$2"/)
-  echo "Paper build $2"
-  echo "File: $(jq -r ".downloads.application.name" <<<"$data")"
-  echo "File sha256: $(jq -r ".downloads.application.sha256" <<<"$data")"
-  echo "Changes: "
+  echo -e "Paper build $2\n"
+  echo -e "File: $(jq -r ".downloads.application.name" <<<"$data")\n"
+  echo -e "File sha256: $(jq -r ".downloads.application.sha256" <<<"$data")\n"
+  echo -e "Changes: \n "
 
   echo "$data" | jq -c ".changes.[]" | jq -r ".message" | while read -r message; do
     echo "$message"
@@ -122,7 +124,9 @@ listPaperDetail() {
 }
 
 listPaper() {
-  echo "Available Paper builds for Minecraft $1"
+  if [[ $2 != "true" ]]; then
+    echo "Available Paper versions for Minecraft $1:"
+  fi
   curl -s -A "$useragent" https://api.papermc.io/v2/projects/paper/versions/"$1"/builds | jq -c ".builds.[]" | while read -r builds; do
     build=$(jq -r ".build" <<<"$builds")
     summary=$(jq -r ".changes.[0].summary" <<<"$builds")
@@ -187,11 +191,15 @@ if [[ $1 == "detail" ]]; then
 fi
 
 if [[ $1 == "list" ]]; then
+  clean="false"
   while [[ $# -gt 1 ]]; do
     case "$2" in
     -h | --help)
       listHelp
       exit 0
+      ;;
+    --clean)
+      clean="true"
       ;;
     --minecraft)
       mode="mc"
@@ -214,12 +222,12 @@ if [[ $1 == "list" ]]; then
     shift
   done
   if [[ $mode == "mc" ]]; then
-    listMc
+    listMc "$clean"
     exit 0
   fi
 
   if [[ $mode == "paper" ]]; then
-    listPaper "$minecraftVersion"
+    listPaper "$minecraftVersion" "$clean"
     exit 0
   fi
 
