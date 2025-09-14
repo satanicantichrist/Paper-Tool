@@ -54,26 +54,23 @@ downloadNew() {
   paperversion=$2
   echo "Fetching Paper builds for Minecraft $mcversion..."
 
-  # Fetch builds array
   paperdata=$(curl -s -A "$useragent" "$paperApiUrl/versions/$mcversion/builds")
 
-  # Pick build: either user-specified, or latest (the first element)
   if [[ -z "$paperversion" ]]; then
     build=$(echo "$paperdata" | jq '.[0]')
   else
     build=$(echo "$paperdata" | jq --argjson id "$paperversion" '.[] | select(.id == $id)')
   fi
 
-  # Extract URL
   download=$(echo "$build" | jq -r '.downloads["server:default"].url')
   buildid=$(echo "$build" | jq -r '.id')
 
   echo "Downloading Paper build $buildid..."
   curl -A "$useragent" --progress-bar "$download" -o ./server.jar
 
-  # Save version metadata
   echo "{\"minecraft\": \"$mcversion\", \"paper\": $buildid}" >version.json
 }
+
 installHelp() {
   echo "To install a new server run \"$basecommand install --minecraft-version <minecraft-version>\""
   echo "Or with specific build of paper run \"$basecommand install --minecraft-version <minecraft-version> --paper-build <paper-build>\""
